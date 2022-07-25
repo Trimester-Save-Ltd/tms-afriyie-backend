@@ -1,4 +1,4 @@
-# Awesome Project Build with TypeORM
+# TMS
 
 Steps to run this project:
 
