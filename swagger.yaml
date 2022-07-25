@@ -1,0 +1,1911 @@
+openapi: 3.0.3
+info:
+  title: TMS-CRM Core API Documentation
+  version: 0.0.1
+  description: TMS-CRM Core Backend API Documentation, this browserable documentation is meant to be used in tandem with the tms-crm Core Frontend codebase. new changes to the backend API will reflect here.
+  contact:
+    name: TMS Development Team
+    email: dev@tms.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:4200
+    description: Localhost Development Version
+  - url: https://tms-crm-backend.herokuapp.com/
+    description: Heroku Hosted Development Version
+
+tags:
+  - name: Patient
+    description: Patient management
+  - name: Vital
+    description: Patient Vital management
+  - name: Appointment
+    description: Patient Appointment management
+  - name: Vault
+    description: Patient Vault management
+  - name: Budget
+    description: Patient Budget management
+  - name: Notification
+    description: Patient Notification management
+paths:
+  /api/v1/patient/register:
+    post:
+      tags:
+        - "Patient"
+      summary: Creat a new Patient Object
+      description: Endpoint to create and register a new Patient, along with creating new Patient this endpoint also generate email and phone verification tokens.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientRegistrationReq"
+      responses:
+        201:
+          description: "Successfully created a new Patient"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientRegistrationRes"
+        400:
+          description: "Bad Request/Patient already exists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientRegistrationError400"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/login:
+    post:
+      tags:
+        - Patient
+      summary: Login a Patient
+      description: Endpoint to login a Patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientLoginReq"
+      responses:
+        200:
+          description: Successfully logged in a Patient and return a valid JWT auth token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientLoginRes"
+        400:
+          description: Bad Request / Patient does not exist or password is incorrect / Patient is not verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientLoginError400"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/verify_email:
+    patch:
+      tags:
+        - Patient
+      summary: Verify a Patient's registration email
+      description: Endpoint to verify a Patient's email used to register
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Patient Email verification token/code
+      responses:
+        200:
+          description: Successfully verified a Patient's email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailVerificationRes"
+        400:
+          description: Bad Request / Patient does not exist or email is already verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailVerificationError400"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/verify_phone:
+    patch:
+      tags:
+        - Patient
+      summary: Verify a Patient's registration phone
+      description: Endpoint to verify a Patient's phone used to register
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Patient Phone verification code
+        - in: query
+          name: phone
+          schema:
+            type: string
+          required: true
+          description: Patient Phone number
+      responses:
+        200:
+          description: Successfully verified a Patient's phone
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhoneVerificationRes"
+        400:
+          description: Bad Request / Patient does not exist or phone is already verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhoneVerificationError400"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/forgot_password:
+    patch:
+      tags:
+        - Patient
+      summary: Forgot Password
+      description: Endpoint to initiate password recovery process, note only pass either email or phone, not both
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordReq"
+      responses:
+        200:
+          description: Successfully sent a reset password email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForgotPasswordRes"
+        400:
+          description: Bad Request / Code does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForgotPasswordError400"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/reset_password:
+    patch:
+      tags:
+        - Patient
+      summary: Reset Password
+      description: Endpoint to reset password after password recovery initiated
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Reset forgotten password by providing a valid code and a new password
+        - in: query
+          name: option
+          schema:
+            type: string
+            example: email  remove this if you are not using email option
+          required: false
+          description: the password reset option been used either email or phone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordReq"
+      responses:
+        200:
+          description: Successfully reset password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordRes"
+        400:
+          description: Bad Request / Code does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordError400"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/me:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Patient
+      summary: Get Patient Profile
+      description: Endpoint to get Patient profile
+      responses:
+        200:
+          description: Successfully fetched Patient profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientObject"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/{id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Patient
+      summary: Get Patient Profile by ID
+      description: Endpoint to get Patient profile by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Patient ID
+      responses:
+        200:
+          description: Successfully fetched Patient profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientObject"
+        400:
+          description: Bad Request / Patient data does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceNotFoundError400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/update:
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - Patient
+      summary: Update Patient Profile
+      description: Endpoint to update Patient profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePatientReq"
+      responses:
+        200:
+          description: Successfully updated Patient profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePatientRes"
+        400:
+          description: Bad Request / Patient data does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceNotFoundError400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/change_password:
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - Patient
+      summary: Change Password
+      description: Endpoint to change Patient password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordReq"
+      responses:
+        200:
+          description: Successfully changed Patient password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePasswordRes"
+        400:
+          description: Bad Request / Patient data does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceNotFoundError400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/patient/send_verification_code:
+    post:
+      tags:
+        - Patient
+      summary: Send Verification Code
+      description: Endpoint to send verification code to Patient
+      parameters:
+        - in: query
+          name: phone
+          schema:
+            type: string
+          required: true
+          description: resend verification to phone number provided
+      responses:
+        200:
+          description: Successfully sent verification code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SendVerificationCodeRes"
+        400:
+          description: Bad Request / Patient data does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceNotFoundError400"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+  /api/v1/vital/add_vital:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vital
+      summary: Adding Patient Vital record
+      description: Endpoint to create/add new patient vital record to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddVitalReq"
+      responses:
+        200:
+          description: Successfully added new Patient vital
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalRes"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/vital/update/{id}:
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vital
+      summary: Updating Patient Vital record
+      description: Endpoint to update patient vital record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Vital ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddVitalReq"
+      responses:
+        200:
+          description: Successfully updated Patient vital
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalRes"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/vital/delete/{id}:
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vital
+      summary: Deleting Patient Vital record
+      description: Endpoint to delete patient vital record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Vital ID
+      responses:
+        200:
+          description: Successfully delete Patient vital
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalDeletionRes"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/vital/{id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vital
+      summary: Return single Patient Vital record
+      description: Endpoint to return patient vital record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Vital ID
+      responses:
+        200:
+          description: Successfully return Patient vital
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalRes"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+  /api/v1/vital/patient_vitals:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vital
+      summary: return all Patient Vital record
+      description: Endpoint to return patient vital record to the system
+      responses:
+        200:
+          description: Successfully return Patient vital
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalRes"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+  /api/v1/appointment/add_appointment:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Appointment
+      summary: Adding Patient Appointment record
+      description: Endpoint to create/add new patient appointment record to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppointmentReq"
+      responses:
+        200:
+          description: Successfully added new Patient appointment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/appointment/update/{id}:
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - Appointment
+      summary: Updating Patient Appointment record
+      description: Endpoint to update patient appointment record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Appointment ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppointmentReq"
+      responses:
+        200:
+          description: Successfully updated Patient appointment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/appointment/delete/{id}:
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - Appointment
+      summary: Deleting Patient Appointment record
+      description: Endpoint to delete patient appointment record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Appointment ID
+      responses:
+        200:
+          description: Successfully delete Patient appointment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentDeletionRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+  /api/v1/appointment/{id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Appointment
+      summary: Return single Patient Appointment record
+      description: Endpoint to return patient appointment record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Appointment ID
+      responses:
+        200:
+          description: Successfully return Patient appointment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+  /api/v1/appointment/patient_appointments:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Appointment
+      summary: return all Patient Appointment record
+      description: Endpoint to return patient appointment record to the system
+      responses:
+        200:
+          description: Successfully return Patient appointment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentRes"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/budget/add_budget:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Budget
+      summary: Adding Patient Budget record
+      description: Endpoint to create/add new patient budget record to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetReq"
+      responses:
+        200:
+          description: Successfully added new Patient budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BudgetRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+  /api/v1/budget/update/{id}:
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - Budget
+      summary: Updating Patient Budget record
+      description: Endpoint to update a single patient budget record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Budget ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetReq"
+      responses:
+        200:
+          description: Successfully updated Patient budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BudgetRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/budget/delete/{id}:
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - Budget
+      summary: Deleting Patient Budget record
+      description: Endpoint to delete patient budget record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Budget ID
+      responses:
+        200:
+          description: Successfully delete Patient budget record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BudgetDeletionRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/budget/{id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Budget
+      summary: Return single Patient Budgte record
+      description: Endpoint to return patient budget record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Budget ID
+      responses:
+        200:
+          description: Successfully return Patient budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BudgetRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/budget/patient_budgets:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Budget
+      summary: return all Patient Budget record
+      description: Endpoint to return patient budget record to the system
+      responses:
+        200:
+          description: Successfully return Patient budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BudgetRes"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+  /api/v1/vault/add_file:
+    post:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vault
+      summary: Adding Patient File to vault
+      description: Endpoint to create/add new patient file to vault
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                upload:
+                  type: string
+                  format: binary
+                  description: File to be uploaded, eg image, pdf, etc
+                description:
+                  type: string
+                  description: Description of the file to be uploaded
+      responses:
+        200:
+          description: Successfully added new Patient budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VaultRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/vault/update_file/{id}:
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vault
+      summary: Updating Patient File in vault
+      description: Endpoint to update patient file in vault
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: File Cloudinary ID
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                upload:
+                  type: string
+                  format: binary
+                  description: File to be uploaded to replace the old one, this can be empty if only Updating description, eg image, pdf, etc
+                description:
+                  type: string
+                  description: Description of the file to be uploaded is can be empty
+      responses:
+        200:
+          description: Successfully added new Patient budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VaultRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/vault/delete/{id}:
+    delete:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vault
+      summary: Deleting Patient File from vault
+      description: Endpoint to delete patient file from vault
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: File Cloudinary ID
+      responses:
+        200:
+          description: Successfully deleted Patient budget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VaultDeletionRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/vault/{id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vault
+      summary: Return single Patient File record
+      description: Endpoint to return patient file record to the system
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: File Cloudinary ID
+      responses:
+        200:
+          description: Successfully return Patient file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VaultRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/vault/patient_files:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Vault
+      summary: Return all Patient File record
+      description: Endpoint to return patient file record to the system
+      responses:
+        200:
+          description: Successfully return Patient file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VaultRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/notification/read_notification/{id}:
+    patch:
+      security:
+        - JWTAuth: []
+      tags:
+        - Notification
+      summary: return notification and mark notification as read
+      description: Endpoint to return details about notification and mark notification as read
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Notification ID
+      responses:
+        200:
+          description: Successfully return notification and marked notification as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+  /api/v1/notification/{id}:
+    get:
+      security:
+        - JWTAuth: []
+      tags:
+        - Notification
+      summary: return notification
+      description: Endpoint to return details about notification
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Notification ID
+      responses:
+        200:
+          description: Successfully return notification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationGRes"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest400"
+        401:
+          description: Unauthorized authentication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError401"
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError500"
+
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    PatientObject:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Patient profile returned Successfully"
+        result:
+          type: object
+          example:
+            _id:
+            example: 624c913a28b71adcc6012a08
+            first_name:
+              example: John
+            last_name:
+              example: Doe
+            email:
+              example:
+            phone:
+              example: "+23322322233"
+            verify_email:
+              example: true
+            verify_phone:
+              example: true
+            created_at:
+              example: 2020-05-05T12:00:00.000Z
+            updated_at:
+              example: 2020-05-05T12:00:00.000Z
+            __v:
+              example: 0
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUxOGQ0MjcyZmU
+    UpdatePatientReq:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+    UpdatePatientRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Patient profile returned Successfully"
+        result:
+          type: object
+          example:
+            _id:
+            type: integer
+            example: 624c913a28b71adcc6012a08
+            first_name:
+              type: string
+              example: John
+            last_name:
+              type: string
+              example: Doe
+            email:
+              type: string
+              example:
+            phone:
+              type: string
+              example: "+23322322233"
+            verify_email:
+              type: boolean
+              example: true
+            verify_phone:
+              type: boolean
+              example: true
+            created_at:
+              type: string
+              example: 2020-05-05T12:00:00.000Z
+            updated_at:
+              type: string
+              example: 2020-05-05T12:00:00.000Z
+
+    PatientRegistrationReq:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: Jane
+        last_name:
+          type: string
+          example: Doe
+        phone:
+          type: string
+          example: "+233202323243444"
+        password:
+          type: string
+          example: strongpassword
+
+    BudgetReq:
+      type: object
+      properties:
+        budget_type:
+          type: string
+          example: Medical
+        description:
+          type: string
+          example: budget to compensate for hicked medical bills or future emergency bills
+        amount:
+          type: integer
+          example: 10000
+
+    BudgetRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Budget returned Successfully"
+        result:
+          type: object
+          example:
+            _id:
+            type: integer
+            example: 624c913a28b71adcc6012a08
+            budget_type:
+              type: string
+              example: Medical
+            description:
+              type: string
+              example: budget to compensate for hicked medical bills or future emergency bills
+            amount:
+              type: integer
+              example: 10000
+            created_at:
+              type: string
+              example: 2020-05-05T12:00:00.000Z
+            updated_at:
+              type: string
+              example: 2020-05-05T12:00:00.000Z
+            __v:
+              type: integer
+              example: 0
+
+    AppointmentReq:
+      type: object
+      properties:
+        event:
+          type: string
+          example: Consultation
+        location:
+          type: string
+          example: Mothers Specilist hospital
+        appointment_start_date_time:
+          type: date
+          example: 2020-05-05T12:00:00.000Z
+        appointment_end_date_time:
+          type: date
+          example: 2020-05-05T12:20:10.000Z
+        comment:
+          type: date
+          example: i will be having a Consultation with an ear doctor.
+
+    AddVitalReq:
+      type: object
+      properties:
+        vital_type:
+          type: string
+          example: weight
+        value:
+          type: string
+          example: 90kg
+        interpretation:
+          type: string
+          example: he is on average weight category but could do better
+        first_day_of_last_circle:
+          type: date
+          description: this section is only reqired when the  vital_type is gestation
+          example: this is the first day of the patient menstral peroid
+        full_term_date:
+          type: date
+          description: this section is only reqired when the  vital_type is gestation
+          example: this is the calculated date for delivery/due date
+        description:
+          type: string
+          example: this is the record that shows how fat/ the blood level of the patient
+
+    AppointmentRes:
+      type: object
+      properties:
+        code:
+          type: int
+          example: 200
+        message:
+          type: string
+          example: Appointment return successfully
+        result:
+          type: object
+          example:
+            vital_type:
+              type: string
+              example: weight
+            value:
+              type: string
+              example: 90kg
+            interpretation:
+              type: string
+              example: he is on average weight category but could do better
+            last_period_date:
+              type: date
+              description: this section is only reqired when the  vital_type is gestation
+              example: this is the last day of the patient menstral peroid
+            full_term_date:
+              type: date
+              description: this section is only reqired when the  vital_type is gestation
+              example: this is the calculated date for delivery
+            description:
+              type: string
+              example: this is the record that shows how fat/ the blood level of the patient
+            patient:
+              type: string
+              example: 1343gd345675685654
+
+    VitalRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Vital created successfully
+        result:
+          type: object
+          example:
+            vital_type:
+              type: string
+              example: weight
+            value:
+              type: string
+              example: 90kg
+            interpretation:
+              type: string
+              example: he is on average weight category but could do better
+            last_period_date:
+              type: date
+              example: this is the last day of the patient menstral peroid
+            full_term_date:
+              type: date
+              example: this is the calculated date for delivery
+            description:
+              type: string
+            patient:
+              type: string
+              example: 1343gd345675685654
+
+    PatientLoginReq:
+      type: object
+      properties:
+        phone:
+          type: string
+          example: "+233202323243444"
+        password:
+          type: string
+          example: strongpassword
+
+    ForgotPasswordReq:
+      type: object
+      properties:
+        phone:
+          type: string
+          example: "+233202323243444"
+        email:
+          type: string
+          example: jane@sample.com
+
+    ResetPasswordReq:
+      type: object
+      properties:
+        password:
+          type: string
+          example: strongpassword
+
+    ChangePasswordReq:
+      type: object
+      properties:
+        currentpassword:
+          type: string
+          example: strongpassword
+        newpassword:
+          type: string
+          example: strongpassword
+    ChangePasswordRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: "Password changed successfully"
+    PatientRegistrationRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: Registration successful, verification token sent.
+        result:
+          type: object
+          example:
+            userid: 624c913a28b71adcc6012a08
+            emailverified: false,
+            _id: 624c913a28b71adcc6012a0b
+            emailverificationcode": ce00a183-ff99-499b-977d-871665eb7638
+            __v: 0
+
+    PatientLoginRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Login successful
+        result:
+          type: object
+          example:
+            _id: 624c913a28b71adcc6012a08
+            first_name: Jane
+            last_name: Doe
+            email: jane@sample.com
+            phone: "+1234567890"
+            verify_phone: true
+            verify_email: true
+            _v: 3
+            resetlink:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUxOGQ0MjcyZmU
+
+    EmailVerificationRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Email verified successfully
+        result:
+          type: object
+          example:
+            _id: 62540b8d895679af5ce8fad4
+            userid: 624c913a28b71adcc6012a0b
+            emailverified: true
+            emailverificationcode": 07106118-6a86-480e-865c-d43725ab7d5e
+            __v: 0
+
+    PhoneVerificationRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Phone verified successfully
+    ForgotPasswordRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: Password reset link sent to your email.
+    ResetPasswordRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: Password reset successful.
+
+    PatientRegistrationError400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: "data and salt arguments required"
+    UnauthorizedError401:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 401
+        error:
+          type: string
+          example: "Invalid authorization credentials"
+    InternalServerError500:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 500
+        error:
+          type: string
+          example: "Internal Server Error"
+    PatientLoginError400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Patient not found/ Incorrect password / Patient not verified
+
+    EmailVerificationError400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Verification code is already used / Verification code is invalid
+
+    PhoneVerificationError400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Verification code is invalid/ The requested resource /Services/VAbb433ff462dcf80a27190a3f2b4fd8f7/VerificationCheck was not found
+
+    ForgotPasswordError400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: No user is Associated with this email or phone / Patient not verified
+    ResetPasswordError400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: JWT expired
+    ResourceNotFoundError400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: "The requested resources was not found"
+    SendVerificationCodeRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: Verification code sent to your phone.
+    BadRequest400:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: One of the data needed to complete this operation is missing
+    VitalDeletionRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Vital deleted successfully
+    AppointmentDeletionRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Appointment deleted successfully
+    BudgetDeletionRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Budget deleted successfully
+    VaultRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Vault uploaded successfully
+        result:
+          type: object
+          example:
+            description: splach 1
+            file_url: https://res.cloudinary.com/trimester-save-ltd/image/upload/v1658501903/yihqw6yyhcpnj9z0diz3.jpg
+            cloudinary_id: yihqw6yyhcpnj9z0diz3
+            asset_id: ea86cdc381ee21e0ba1197b7ed9fed17
+            patient: f8ed9ebb-3661-411b-8633-01089187171f
+            _id: 1
+    VaultDeletionRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Vault deleted successfully
+    NotificationRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Notification returned and read successfully
+        result:
+          type: object
+          example:
+            _id: 5e8f8f8f895679af5ce8fad4
+            patient: f8ed9ebb-3661-411b-8633-01089187171f
+            notification_type: appointment
+            content:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Appointment
+                message:
+                  type: string
+                  example: Appointment with Dr. John Doe has been scheduled.
+            alert: Appointment with Dr. John Doe has been scheduled.
+            read: true
+    NotificationGRes:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Notification returned successfully
+        result:
+          type: object
+          example:
+            id: 5e8f8f8f895679af5ce8fad4
+            notification_type: appointment
+            alert: Appointment with Dr. John Doe has been scheduled.
+            created_at: 2020-01-01T00:00:00.000Z
+            updated_at: 2020-01-01T00:00:00.000Z
