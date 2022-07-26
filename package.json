@@ -15,7 +15,7 @@
       "url": "git+https://github.com/Trimester-Save-Ltd/tms-crm-backend.git"
    },
    "author": "Trimester Save Ltd",
-   "license": "ISC",
+   "license": "MIT",
    "bugs": {
       "url": "https://github.com/Trimester-Save-Ltd/tms-crm-backend/issues"
    },
