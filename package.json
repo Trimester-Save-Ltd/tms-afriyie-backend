@@ -1,7 +1,7 @@
 {
-   "name": "tms-crm-backend",
+   "name": "TMS Afriyie-Backend",
    "version": "1.0.0",
-   "description": "backend api for tms-crm",
+   "description": "The TMS Afriyie web backend is a patient facing application that offers healthcare focused financial solutions  and budgeting ",
    "main": "server.ts",
    "scripts": {
       "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
