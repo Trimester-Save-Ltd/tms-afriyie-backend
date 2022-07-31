@@ -16,4 +16,7 @@ Trimester Save Ltd has adopted a Code of Conduct that we expect project particip
 ## Contact
 For any info contact us at info@trimestersave.com
 
+##  License
+Afriyie is [MIT licensed]()
+
 
