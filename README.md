@@ -1,7 +1,5 @@
-# TMS
+# TMS Afriyie App
 
-Steps to run this project:
+The TMS Afriyie web application is a patient facing application that offers healthcare focused financial solutions and skills such as savings and budgeting whilst leveraging insights from their healthcare journey, especially during pregnancy, childbirth and the first years of life of their children. The advantages for using the TMS Afriyie app is that women who are empowered are able to employ their intrinsic organizational strength to better save budget, plan and follow through on their hospital visits, and that is what Afriyie is about.
+Health is wealth but in emerging economies wealth can also mean the difference between good and bad. Afriyie is therefore an Out-of-the-box approach to health premised on the fact that finance is a determinant of health.
 
-1. Run `npm i` command
-2. Setup database settings inside `data-source.ts` file
-3. Run `npm start` command
