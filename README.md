@@ -1,8 +1,8 @@
- [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](https://github.com/Trimester-Save-Ltd/tms-afriyie-backend/blob/main/Code%20of%20Conduct.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](https://github.com/Trimester-Save-Ltd/tms-afriyie-backend/blob/main/Code%20of%20Conduct.md)
 
 ## Introduction
 
-The TMS Afriyie web application is a patient facing application that offers healthcare focused financial solutions and skills such as savings and budgeting whilst leveraging insights from their healthcare journey, especially during pregnancy, childbirth and the first years of life of their children. <br/>
+The TMS Afriyie web application is a patient-facing application that offers healthcare-focused financial solutions and skills such as savings and budgeting whilst leveraging insights from their healthcare journey, especially during pregnancy, childbirth and the first years of life of their children. <br/>
 Health is wealth but in emerging economies wealth can also mean the difference between good and bad. Afriyie is therefore an Out-of-the-box approach to health premised on the fact that finance is a determinant of health.
 
 ## Installation
