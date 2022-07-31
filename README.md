@@ -19,6 +19,6 @@ Trimester Save Ltd has adopted a Code of Conduct that we expect project particip
 For any info contact us at info@trimestersave.com
 
 ##  License
-Afriyie is [MIT licensed](https://github.com/Trimester-Save-Ltd/tms-afriyie-backend/blob/main/LICENSE)
+Afriyie is [MIT licensed](https://github.com/Trimester-Save-Ltd/tms-afriyie-backend/blob/main/LICENSE) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
