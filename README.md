@@ -1,4 +1,4 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT%-blue.svg)](https://opensource.org/licenses/MIT) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](https://github.com/Trimester-Save-Ltd/tms-afriyie-backend/blob/main/Code%20of%20Conduct.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-#800080.svg)](https://github.com/Trimester-Save-Ltd/tms-afriyie-backend/blob/main/Code%20of%20Conduct.md)
 
 ## Introduction
 
