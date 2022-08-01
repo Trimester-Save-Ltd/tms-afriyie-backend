@@ -35,11 +35,16 @@ class TwilioService {
      * @returns {object} - object containing status and infomation of the request
      */
     public async twilioverifytoken(verifier: string, token: string): Promise<VerificationCheckInstance> {
-        const verificationobject = await client.verify.services(verifyservice).verificationChecks.create({
-            to: verifier,
-            code: token
-        });
-        return verificationobject;
+        try{
+            const verificationobject = await client.verify.services(verifyservice).verificationChecks.create({
+                to: verifier,
+                code: token
+            })
+            return verificationobject;
+        }
+        catch (error) {
+            throw new Error((error.status));
+        }
     }
 
     // TODO create a generic email sending method

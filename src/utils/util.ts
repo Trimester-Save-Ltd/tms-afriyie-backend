@@ -23,6 +23,7 @@ class UtilSever {
      */
     public async calculateGestation(first_day_of_last_circle: Date): Promise<Date> {
         try {
+            // Gestational Age = (280 - (EDD - Reference Date)
             const first_day = new Date(first_day_of_last_circle);
             const last_month = new Date(first_day.setMonth(first_day.getMonth() - 3));
             const last_month_plus_one_year = new Date(last_month.setFullYear(last_month.getFullYear() + 1));

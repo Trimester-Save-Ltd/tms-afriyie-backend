@@ -8,7 +8,7 @@ import CloudinaryService from "../../services/cloudinary";
  */
 @Entity('vaults')
 class Vault extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     _id!: string;
 
     // @Column({

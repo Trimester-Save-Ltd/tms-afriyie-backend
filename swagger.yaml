@@ -1,14 +1,14 @@
 openapi: 3.0.3
 info:
-  title: TMS-CRM Core API Documentation
+  title: TMS Afriyie Core API Documentation
   version: 0.0.1
-  description: TMS-CRM Core Backend API Documentation, this browserable documentation is meant to be used in tandem with the tms-crm Core Frontend codebase. new changes to the backend API will reflect here.
+  description: TMS Afriyie Core Backend API Documentation, this browserable documentation is meant to be used in tandem with the TMS Afriyie Core Frontend codebase. new changes to the backend API will reflect here.
   contact:
     name: TMS Development Team
     email: dev@tms.com
   license:
-    name: Apache 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0.html
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 servers:
   - url: http://localhost:4200
     description: Localhost Development Version
@@ -128,20 +128,13 @@ paths:
       tags:
         - Patient
       summary: Verify a Patient's registration phone
-      description: Endpoint to verify a Patient's phone used to register
-      parameters:
-        - in: query
-          name: code
-          schema:
-            type: string
-          required: true
-          description: Patient Phone verification code
-        - in: query
-          name: phone
-          schema:
-            type: string
-          required: true
-          description: Patient Phone number
+      description: Endpoint to verify a Patient's phone used to register, token expires after 10 minutes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhoneVerificationReq"
       responses:
         200:
           description: Successfully verified a Patient's phone
@@ -388,13 +381,12 @@ paths:
         - Patient
       summary: Send Verification Code
       description: Endpoint to send verification code to Patient
-      parameters:
-        - in: query
-          name: phone
-          schema:
-            type: string
-          required: true
-          description: resend verification to phone number provided
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendVerificationCodeReq"
       responses:
         200:
           description: Successfully sent verification code
@@ -422,7 +414,7 @@ paths:
       tags:
         - Vital
       summary: Adding Patient Vital record
-      description: Endpoint to create/add new patient vital record to the system
+      description: Endpoint to create/add new patient vital record to the system BLOOD_PRESSURE = 'BP', GLUCOSE_LEVEL = 'GL', WEIGHT = 'WE', GESTATION = 'GE'
       requestBody:
         required: true
         content:
@@ -461,7 +453,7 @@ paths:
       tags:
         - Vital
       summary: Updating Patient Vital record
-      description: Endpoint to update patient vital record to the system
+      description: Endpoint to update patient vital record to the system using this BLOOD_PRESSURE = 'BP', GLUCOSE_LEVEL = 'GL', WEIGHT = 'WE',GESTATION = 'GE'
       parameters:
         - in: path
           name: id
@@ -822,7 +814,7 @@ paths:
       tags:
         - Budget
       summary: Adding Patient Budget record
-      description: Endpoint to create/add new patient budget record to the system
+      description: Endpoint to create/add new patient budget record to the system budget type include MEDICAL = 'ME', FOOD = 'FO', PERSONAL = 'PE', TRAVEL = 'TR', OTHER = 'OT'
       requestBody:
         required: true
         content:
@@ -1022,7 +1014,7 @@ paths:
       tags:
         - Vault
       summary: Adding Patient File to vault
-      description: Endpoint to create/add new patient file to vault
+      description: Endpoint to create/add new patient file to vault 
       requestBody:
         required: true
         content:
@@ -1422,7 +1414,10 @@ components:
       properties:
         budget_type:
           type: string
-          example: Medical
+          example: ME
+        budget_date:
+          type: date
+          example: 2020-05-05
         description:
           type: string
           example: budget to compensate for hicked medical bills or future emergency bills
@@ -1439,31 +1434,16 @@ components:
         message:
           type: string
           example: "Budget returned Successfully"
+          "result": 
         result:
           type: object
           example:
-            _id:
-            type: integer
-            example: 624c913a28b71adcc6012a08
-            budget_type:
-              type: string
-              example: Medical
-            description:
-              type: string
-              example: budget to compensate for hicked medical bills or future emergency bills
-            amount:
-              type: integer
-              example: 10000
-            created_at:
-              type: string
-              example: 2020-05-05T12:00:00.000Z
-            updated_at:
-              type: string
-              example: 2020-05-05T12:00:00.000Z
-            __v:
-              type: integer
-              example: 0
-
+            budget_type: "ME"
+            description: "budget to compensate for hicked medical bills or future emergency bills"
+            amount: 500
+            patient: "2f636736-7816-4b8b-9c59-154ac76f8f22"
+            budget_date: "2020-05-05"
+          
     AppointmentReq:
       type: object
       properties:
@@ -1488,7 +1468,7 @@ components:
       properties:
         vital_type:
           type: string
-          example: weight
+          example: WE
         value:
           type: string
           example: 90kg
@@ -1555,26 +1535,18 @@ components:
         result:
           type: object
           example:
-            vital_type:
-              type: string
-              example: weight
-            value:
-              type: string
-              example: 90kg
-            interpretation:
-              type: string
-              example: he is on average weight category but could do better
-            last_period_date:
-              type: date
-              example: this is the last day of the patient menstral peroid
-            full_term_date:
-              type: date
-              example: this is the calculated date for delivery
-            description:
-              type: string
-            patient:
-              type: string
-              example: 1343gd345675685654
+            vital_type: WE
+            value: 190kg
+            interpretation: the is on average weight category but could do better
+            description: this is the record that shows how fat/ the blood level of the patient
+            patient: 2f636736-7816-4b8b-9c59-154ac76f8f22
+            first_day_of_last_circle: null
+            full_term_date: null
+            due_in_days: null
+            _id: de3a1cd6-ee68-4b7a-a482-e92b7753ef3d
+            delivered: false
+            created_at: 2022-07-31
+            updated_at: 2022-07-31
 
     PatientLoginReq:
       type: object
@@ -1909,3 +1881,18 @@ components:
             alert: Appointment with Dr. John Doe has been scheduled.
             created_at: 2020-01-01T00:00:00.000Z
             updated_at: 2020-01-01T00:00:00.000Z
+    SendVerificationCodeReq:
+      type: object
+      properties:
+        phone:
+          type: string
+          example: "+2332312121212"
+    PhoneVerificationReq:
+      type: object
+      properties:
+        phone:
+          type: string
+          example: "+2332312121212"
+        code:
+          type: string
+          example: "071343"

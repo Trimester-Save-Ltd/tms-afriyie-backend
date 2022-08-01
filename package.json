@@ -1,7 +1,7 @@
 {
-   "name": "TMS Afriyie-Backend",
+   "name": "tms-crm-backend",
    "version": "1.0.0",
-   "description": "The TMS Afriyie web backend is a patient facing application that offers healthcare focused financial solutions  and budgeting ",
+   "description": "backend api for tms-crm",
    "main": "server.ts",
    "scripts": {
       "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -14,8 +14,8 @@
       "type": "git",
       "url": "git+https://github.com/Trimester-Save-Ltd/tms-crm-backend.git"
    },
-   "author": "Trimester Save Ltd",
-   "license": "MIT",
+   "author": "Allaye (Kolade Gideon)",
+   "license": "ISC",
    "bugs": {
       "url": "https://github.com/Trimester-Save-Ltd/tms-crm-backend/issues"
    },
@@ -42,6 +42,7 @@
       "bcrypt": "^5.0.1",
       "bree": "^9.1.1",
       "cabin": "^9.1.2",
+      "class-validator": "^0.13.2",
       "cloudinary": "^1.30.0",
       "cors": "^2.8.5",
       "delay": "^5.0.0",

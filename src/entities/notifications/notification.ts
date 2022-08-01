@@ -7,7 +7,7 @@ import { notification_type } from "../../enums/enum";
  */
 @Entity('notifications')
 class Notification extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     _id!: string;
 
     @Column({

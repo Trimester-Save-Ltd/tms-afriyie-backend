@@ -9,7 +9,7 @@ import Patient from "./patient";
  */
 @Entity('patientsverification')
 class Patientverification extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id!: string;
 
     @Column({
@@ -57,12 +57,17 @@ class Patientverification extends BaseEntity {
     * @returns {object} - response object from the twilio verify service verifytoken operation
     */
     static async verifyphone(verifier: string, code: string): Promise<object> {
-        const ts = new TwilioService();
-        const verifystatus = await ts.twilioverifytoken(verifier, code);
-        if (verifystatus.status !== "approved") {
-            throw new Error("Verification code is invalid");
+        try {
+            const ts = new TwilioService();
+            const verifystatus = await ts.twilioverifytoken(verifier, code);
+            if (verifystatus.status !== "approved") {
+                throw new Error("Verification code is invalid");
+            }
+            return verifystatus;
         }
-        return verifystatus;
+        catch (error) {
+            throw new Error(error);
+        }
     }
 
 

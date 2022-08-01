@@ -7,7 +7,7 @@ import UtilSever from "../../utils/util";
  */
 @Entity('vitals')
 class Vital extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     _id!: string;
 
     @Column({

@@ -6,7 +6,7 @@ import Patient from "../patients/patient";
  */
 @Entity('appointments')
 class Appointment extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     _id!: string;
 
     @Column({

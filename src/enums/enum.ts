@@ -18,3 +18,12 @@ export enum notification_type {
     GESTATION = 'GESTATION',
     VITAL = 'VITAL'
 }
+
+export enum error_type {
+    ER_BAD_NULL_ERROR = 'Field cannot be null',
+    ER_DUP_ENTRY = 'Duplicate entry %s for key %s',
+    ER_EMPTY_QUERY = 'Query was empty',
+    ER_ALTER_INFO = 'Records %id Duplicate entry %s for key %s',
+    ER_UNKNOWN_ERROR = 'Unknown error occured'
+
+}

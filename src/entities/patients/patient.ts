@@ -1,4 +1,5 @@
 import path from 'path';
+import { ValidationError, MinLength, MaxLength, IsNotEmpty, IsString, Length, validate, validateOrReject } from 'class-validator';
 import { AfterInsert, BaseEntity, BeforeInsert, Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -31,10 +32,21 @@ class Patient extends BaseEntity {
     @PrimaryColumn()
     _id!: string;
 
-    @Column()
+
+    @Column({
+        nullable: false,
+        unique: false
+    })
+    @IsString()
+    @IsNotEmpty({ message: "Please enter your first name" })
     first_name!: string;
 
-    @Column()
+    @Column({
+        nullable: false,
+        unique: false
+    })
+    @IsString()
+    @IsNotEmpty({ message: "Please enter your last name" })
     last_name!: string;
 
     @Column({
@@ -45,13 +57,15 @@ class Patient extends BaseEntity {
 
     @Column({
         unique: true,
-        nullable: true,
+        nullable: false,
     })
     phone!: string;
 
     @Column({
         select: true
     })
+    @MinLength(8, { message: "Password must be at least 6 characters long" })
+    // @MaxLength(20, { message: "Password must be less than 20 characters long" })
     password!: string;
 
     @Column({
@@ -61,6 +75,7 @@ class Patient extends BaseEntity {
 
     @Column({
         type: 'jsonb',
+        select: false,
         array: false,
         default: () => "'[]'",
         nullable: false,
@@ -151,23 +166,30 @@ class Patient extends BaseEntity {
             return Manager.transaction(async transactionalEntityManager => {
                 const patient = await transactionalEntityManager.create(Patient, data);
                 const patientverification = transactionalEntityManager.create(Patientverification);
-                await transactionalEntityManager.save(patient);
-                patientverification.patient = patient;
+                await validateOrReject(patient);
+                // console.log('errruur', aa[0] instanceof ValidationError, aa, ValidationError);
+                // if (aa.length > 0) {
+                //     throw new Error(aa[0].constraints.message);
+                // }
+                //await transactionalEntityManager.save(patient);
                 if (patient.email) {
                     const email_token = patientverification.generateEmailVerificationCode();
                     const es = new EmailService();
+                    await transactionalEntityManager.save(patient);
+                    patientverification.patient = patient.id;
                     await transactionalEntityManager.save(patientverification);
-                    const verificationlink = `${getBaseUrl()}/patient/verify_email?code=${email_token}`;
+                    const verificationlink = `${process.env.FRONTEND}/patient/verify_email?code=${email_token}`;
                     es.senduserregistrationemail(patient.email, verificationlink, patient.first_name);
                     const phone_data = patientverification.generatePhoneVerificationCode(patient.phone);
                     return phone_data;
                 }
-                await transactionalEntityManager.save(patientverification);
+                await transactionalEntityManager.save(patient);
+                // await transactionalEntityManager.save(patientverification);
                 return patientverification.generatePhoneVerificationCode(patient.phone);
             })
         }
         catch (err) {
-            throw new Error((err as Error).message);
+            throw new Error(err);
         }
     }
 
@@ -220,7 +242,7 @@ class Patient extends BaseEntity {
         // return userverification;
     };
 
-    
+
     /**
     * @description - Find a user by the provided username and password
     * @param {string} email - email of the user
@@ -239,6 +261,8 @@ class Patient extends BaseEntity {
         if (!isMatch) {
             throw new Error("Unable to login user check credentials");
         }
+        delete patient.password;
+        delete patient.tokens;
         return patient;
     };
 
@@ -265,7 +289,7 @@ class Patient extends BaseEntity {
                 const es = new EmailService();
                 await patient.save();
                 return await es.sendpasswordresetemail(resetlink, patient.first_name, patient.email);
-            }            
+            }
         }
         catch (err) {
             throw new Error((err as Error).message);
@@ -285,7 +309,7 @@ class Patient extends BaseEntity {
         }
         try {
             const ts = new TwilioService();
-            const code  = new UtilSever().generateToken(6);
+            const code = new UtilSever().generateToken(6);
             patient.reset_code = code;
             await patient.save();
             return await ts.sendSMS(phone, `Your reset code is ${code}`);
@@ -320,6 +344,8 @@ class Patient extends BaseEntity {
             patient.resetlink = "";
             //TODO : send email to user to notify password reset
             await patient.save();
+            delete patient.password;
+            delete patient.tokens;
             return patient
         }
         catch (err) {
@@ -344,6 +370,8 @@ class Patient extends BaseEntity {
             patient.reset_code = null;
             //TODO : send email to user to notify password reset
             await patient.save();
+            delete patient.password;
+            delete patient.tokens;
             return patient
         }
         catch (err) {
@@ -365,6 +393,8 @@ class Patient extends BaseEntity {
             patient.password = await Patient.hashPassword(newpassword);
             await patient.save();
             //TODO send notification email to user to notify password change success
+            delete patient.password;
+            delete patient.tokens;
             return patient;
         }
         catch (err) {
@@ -390,6 +420,8 @@ class Patient extends BaseEntity {
         }
         patient.verify_email = true;
         await patient.save();
+        delete patient.password
+        delete patient.tokens;
         return patient;
     };
 
@@ -411,6 +443,8 @@ class Patient extends BaseEntity {
         }
         patient.verify_phone = true;
         await patient.save();
+        delete patient.password
+        delete patient.tokens;
         return patient;
     };
 
@@ -435,6 +469,8 @@ class Patient extends BaseEntity {
             patient[update] = req.body[update];
         });
         await patient.save();
+        delete patient.password;
+        delete patient.tokens;
         return patient;
     };
 
@@ -453,6 +489,8 @@ class Patient extends BaseEntity {
             patient.password = await Patient.hashPassword(newpassword);
             await patient.save();
             //TODO send notification email to user to notify password change success
+            delete patient.password;
+            delete patient.tokens;
             return patient;
         }
         catch (err) {

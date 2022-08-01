@@ -7,7 +7,7 @@ import { budget_type } from "../../enums/enum";
  */
 @Entity('budgets')
 class Budget extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     _id!: string;
 
     @Column({
@@ -16,6 +16,11 @@ class Budget extends BaseEntity {
         enum: budget_type,
     })
     budget_type!: string;
+
+    @Column({
+        nullable: true
+    })
+    budget_date!: Date;
 
     @Column({
         nullable: false
@@ -27,6 +32,8 @@ class Budget extends BaseEntity {
     })
     amount!: number;
 
+    @CreateDateColumn()
+    created_at!: Date
     // @Column({
     //     nullable: false
     // })
@@ -61,6 +68,7 @@ class Budget extends BaseEntity {
             const updates = Object.keys(data);
             const allowedupdates = [
                 "budget_type",
+                "budget_date",
                 "amount",
                 "description",
             ];
