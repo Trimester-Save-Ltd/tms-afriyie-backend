@@ -19,11 +19,6 @@ Trimester Save Ltd has adopted a Code of Conduct that we expect project particip
 For any info contact us at info@trimestersave.com
 
 ##  License
+
 Afriyie is [MIT licensed](https://github.com/Trimester-Save-Ltd/tms-afriyie-backend/blob/main/LICENSE) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-
-1. Run `npm i` command
-2. Setup database settings inside `data-source.ts` file
-3. update the env file, you can personalize it to your needs
-4. Run `npm run dev` command to use the ts-node server or `npm run prod`
- 
