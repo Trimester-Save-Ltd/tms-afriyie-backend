@@ -1,7 +1,7 @@
 {
-   "name": "tms-crm-backend",
+   "name": "tms-afriyie-backend",
    "version": "1.0.0",
-   "description": "backend api for tms-crm",
+   "description": "backend api for tms-afriyie",
    "main": "server.ts",
    "scripts": {
       "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -14,8 +14,8 @@
       "type": "git",
       "url": "git+https://github.com/Trimester-Save-Ltd/tms-crm-backend.git"
    },
-   "author": "Allaye (Kolade Gideon)",
-   "license": "ISC",
+   "author": "Trimester Save Limited",
+   "license": "MIT",
    "bugs": {
       "url": "https://github.com/Trimester-Save-Ltd/tms-crm-backend/issues"
    },
