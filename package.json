@@ -1,7 +1,7 @@
 {
-   "name": "tms-crm-backend",
+   "name": "tms-afriyie-backend",
    "version": "1.0.0",
-   "description": "backend api for tms-crm",
+   "description": "backend api for tms-afriyie",
    "main": "server.ts",
    "scripts": {
       "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
