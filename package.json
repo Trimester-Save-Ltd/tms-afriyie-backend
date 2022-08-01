@@ -14,8 +14,8 @@
       "type": "git",
       "url": "git+https://github.com/Trimester-Save-Ltd/tms-crm-backend.git"
    },
-   "author": "Allaye (Kolade Gideon)",
-   "license": "ISC",
+   "author": "Trimester Save Limited",
+   "license": "MIT",
    "bugs": {
       "url": "https://github.com/Trimester-Save-Ltd/tms-crm-backend/issues"
    },
