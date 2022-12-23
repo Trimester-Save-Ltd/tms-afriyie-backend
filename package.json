@@ -48,7 +48,7 @@
       "delay": "^5.0.0",
       "dotenv": "^16.0.0",
       "express": "^4.17.3",
-      "jsonwebtoken": "^8.5.1",
+      "jsonwebtoken": "^9.0.0",
       "minimist": "^1.2.6",
       "multer": "^1.4.5-lts.1",
       "nodemailer": "^6.7.3",
