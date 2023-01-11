@@ -42,7 +42,7 @@
       "bcrypt": "^5.0.1",
       "bree": "^9.1.1",
       "cabin": "^9.1.2",
-      "class-validator": "^0.13.2",
+      "class-validator": "^0.14.0",
       "cloudinary": "^1.30.0",
       "cors": "^2.8.5",
       "delay": "^5.0.0",
